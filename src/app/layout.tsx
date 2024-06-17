@@ -1,12 +1,15 @@
 // Global layout for all pages
 import '../styles/globals.css';
-import Layout from '../components/Layout';
+import { RecoilRoot } from 'recoil';
+import BasicLayout from '../components/BasicLayout';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Layout>{children}</Layout>
+        <RecoilRoot>
+          <BasicLayout>{children}</BasicLayout>
+        </RecoilRoot>
       </body>
     </html>
   );

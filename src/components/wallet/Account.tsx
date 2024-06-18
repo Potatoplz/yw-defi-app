@@ -1,6 +1,7 @@
 "use client";
 
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
+import { Button } from "../ui";
 
 export function Account() {
   const { address, connector } = useAccount();
@@ -33,13 +34,9 @@ export function Account() {
           </div>
         </div>
       </div>
-      <button
-        className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600"
-        onClick={() => disconnect()}
-        type="button"
-      >
+      <Button color="red" onClick={() => disconnect()}>
         Disconnect
-      </button>
+      </Button>
     </div>
   );
 }

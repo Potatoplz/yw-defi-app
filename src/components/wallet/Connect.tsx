@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Connector, useChainId, useConnect } from "wagmi";
+import { Button } from "../ui";
 
 export function Connect() {
   const chainId = useChainId();
@@ -36,13 +37,8 @@ function ConnectorButton({
   }, [connector, setReady]);
 
   return (
-    <button
-      className="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50"
-      disabled={!ready}
-      onClick={onClick}
-      type="button"
-    >
+    <Button color="green" size="large" onClick={onClick} disabled={!ready}>
       {connector.name}
-    </button>
+    </Button>
   );
 }

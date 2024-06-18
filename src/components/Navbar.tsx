@@ -1,6 +1,6 @@
 // src/components/Navbar.tsx
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 
 const Navbar: React.FC = () => {
   return (
@@ -17,13 +17,13 @@ const Navbar: React.FC = () => {
           </Link>
         </li>
         <li>
-          <Link href="/contact" className="text-white">
-            Contact
+          <Link href="/wallet" className="text-white">
+            Wallet
           </Link>
         </li>
       </ul>
     </nav>
   );
-}
+};
 
 export default Navbar;

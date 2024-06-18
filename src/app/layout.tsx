@@ -1,15 +1,30 @@
 // Global layout for all pages
-import '../styles/globals.css';
-import { RecoilRoot } from 'recoil';
-import BasicLayout from '../components/BasicLayout';
+"use client";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import "../styles/globals.css";
+import { RecoilRoot } from "recoil";
+import BasicLayout from "../components/BasicLayout";
+import { WagmiProvider } from "wagmi";
+import { config } from "@/utils/wagmi/config";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
-        <RecoilRoot>
-          <BasicLayout>{children}</BasicLayout>
-        </RecoilRoot>
+        <WagmiProvider config={config}>
+          <QueryClientProvider client={queryClient}>
+            <RecoilRoot>
+              <BasicLayout>{children}</BasicLayout>
+            </RecoilRoot>
+          </QueryClientProvider>
+        </WagmiProvider>
       </body>
     </html>
   );

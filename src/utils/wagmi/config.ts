@@ -1,5 +1,5 @@
 import { http, createConfig } from "wagmi";
-import { base, mainnet, optimism } from "wagmi/chains";
+import { base, mainnet, optimism, avalancheFuji } from "wagmi/chains";
 import { injected, metaMask, safe, walletConnect } from "wagmi/connectors";
 
 const projectId = "3fbb6bba6f1de962d911bb5b5c9dba88";
@@ -12,7 +12,7 @@ const MetaMaskOptions = {
 };
 
 export const config = createConfig({
-  chains: [mainnet, optimism, base],
+  chains: [mainnet, optimism, base, avalancheFuji],
   ssr: true,
   connectors: [
     injected(),
@@ -24,5 +24,6 @@ export const config = createConfig({
     [mainnet.id]: http(),
     [optimism.id]: http(),
     [base.id]: http(),
+    [avalancheFuji.id]: http("https://api.avax-test.network/ext/bc/C/rpc"), // Avalanche Fuji testnet RPC URL
   },
 });

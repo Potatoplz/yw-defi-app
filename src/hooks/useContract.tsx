@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { ethers } from "ethers";
 
-import { config } from "@/utils/wagmi/config";
+import { WagmiConfig } from "@/utils/wagmi/WagmiConfig";
 import { getChains } from "@wagmi/core";
 
 // useContract hook: Fetches the contract instance using the contract address and ABI.
@@ -15,12 +15,15 @@ export function useContract(contractAddress: string, contractABI: any) {
   useEffect(() => {
     async function initContract() {
       if (isConnected && walletClient) {
-        console.log(">>> Init contract: ", isConnected);
-        console.log(">>> Contract address: ", contractAddress);
-        console.log(">>> Wallet client: ", walletClient);
-        console.log(">>> Wallet address: ", address);
+        console.log(
+          ">>> Init contract: ",
+          isConnected,
+          contractAddress,
+          walletClient,
+          address
+        );
 
-        console.log(">>> Get chains: ", getChains(config));
+        console.log(">>> Get chains: ", getChains(WagmiConfig));
 
         const provider = new ethers.BrowserProvider(walletClient);
         const signer = await provider.getSigner();
@@ -29,6 +32,7 @@ export function useContract(contractAddress: string, contractABI: any) {
           contractABI,
           signer
         );
+
         console.log(">>> Contract instance: ", contractInstance);
 
         setContract(contractInstance);

@@ -1,10 +1,9 @@
 "use client";
 
 import { useAccount } from "wagmi";
-
 import { Account } from "@/components/wallet/Account";
 import { Connect } from "@/components/wallet/Connect";
-import { ContractInteraction } from "@/components/wallet/ContractInteraction";
+import SingleDeposit from "@/components/test/SingleDeposit";
 
 export default function ConnectWallet() {
   const { isConnected } = useAccount();
@@ -13,7 +12,7 @@ export default function ConnectWallet() {
       {isConnected ? (
         <>
           <Account />
-          <ContractInteraction />
+          <SingleDeposit />
         </>
       ) : (
         <Connect />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useContract } from "@/hooks/useContract";
 import {
   SINGLE_DEPOSIT_ABI,
@@ -10,7 +10,6 @@ function SingleDeposit() {
     SINGLE_DEPOSIT_CONTRACT_ADDRESS,
     SINGLE_DEPOSIT_ABI
   );
-
   const [allowedTokens, setAllowedTokens] = useState<string[] | null>(null);
 
   useEffect(() => {
@@ -19,9 +18,11 @@ function SingleDeposit() {
 
       try {
         const tokens = await contract.getAllAllowedDepositTokens(); // 함수 호출
+        console.log(">>> Allowed tokens: ", tokens);
         setAllowedTokens(tokens);
       } catch (error) {
         console.error("Error fetching allowed tokens:", error);
+        setAllowedTokens(null); // 오류 발생 시 상태 초기화
       }
     }
 
@@ -29,6 +30,7 @@ function SingleDeposit() {
   }, [contract]);
 
   if (loading) {
+    console.log("Loading contract data...");
     return <p>Loading contract data...</p>;
   }
 

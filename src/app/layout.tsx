@@ -5,7 +5,7 @@ import "../styles/globals.css";
 import { RecoilRoot } from "recoil";
 import BasicLayout from "../components/BasicLayout";
 import { WagmiProvider } from "wagmi";
-import { config } from "@/utils/wagmi/config";
+import { WagmiConfig } from "@/utils/wagmi/WagmiConfig";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <WagmiProvider config={config}>
+        <WagmiProvider config={WagmiConfig}>
           <QueryClientProvider client={queryClient}>
             <RecoilRoot>
               <BasicLayout>{children}</BasicLayout>

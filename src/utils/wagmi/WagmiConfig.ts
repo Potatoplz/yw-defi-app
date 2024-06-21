@@ -11,7 +11,7 @@ const MetaMaskOptions = {
   // Other options.
 };
 
-export const config = createConfig({
+export const WagmiConfig = createConfig({
   chains: [mainnet, optimism, base, avalancheFuji],
   ssr: true,
   connectors: [

@@ -1,7 +1,14 @@
 "use client";
 
-import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
+import {
+  useAccount,
+  useDisconnect,
+  useEnsAvatar,
+  useEnsName,
+  useBalance,
+} from "wagmi";
 import { Button } from "../ui";
+import { useEffect } from "react";
 
 export function Account() {
   const { address, connector } = useAccount();
@@ -9,7 +16,33 @@ export function Account() {
   const { data: ensName } = useEnsName({ address });
   const { data: ensAvatar } = useEnsAvatar({ name: ensName! });
 
+  // Fetch balance data
+  const {
+    data: balanceData,
+    isError,
+    isLoading,
+  } = useBalance({
+    address,
+  });
+
   const formattedAddress = formatAddress(address);
+
+  // Log balance data when it changes
+  useEffect(() => {
+    if (balanceData) {
+      console.log("Balance Data:", balanceData);
+      // JSON.stringify doesn't handle BigInts well, so we need to convert them to strings
+      console.log(JSON.stringify(serializeBalanceData(balanceData), null, 2));
+    }
+  }, [balanceData]);
+
+  const serializeBalanceData = (data: any) => {
+    if (!data) return null;
+    return {
+      ...data,
+      value: data.value.toString(), // Convert BigInt to string
+    };
+  };
 
   return (
     <div className="flex flex-row items-center space-x-4">
@@ -25,10 +58,21 @@ export function Account() {
         )}
         <div className="flex flex-col">
           {address && (
-            <div className="text-sm font-medium text-gray-900">
+            <div className="text-sm font-medium text-white-900">
               {ensName ? `${ensName} (${formattedAddress})` : formattedAddress}
             </div>
           )}
+
+          {isLoading ? (
+            <div className="text-xs text-gray-500">Loading balance...</div>
+          ) : isError ? (
+            <div className="text-xs text-red-500">Failed to fetch balance</div>
+          ) : (
+            <div className="text-sm font-medium text-white-900">
+              Balance: {balanceData?.formatted} {balanceData?.symbol}
+            </div>
+          )}
+
           <div className="text-xs text-gray-500">
             Connected to {connector?.name} Connector
           </div>
@@ -43,5 +87,5 @@ export function Account() {
 
 function formatAddress(address?: string) {
   if (!address) return null;
-  return `${address.slice(0, 6)}…${address.slice(38, 42)}`;
+  return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }

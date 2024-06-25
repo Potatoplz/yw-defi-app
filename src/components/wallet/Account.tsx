@@ -1,14 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   useAccount,
   useDisconnect,
   useEnsAvatar,
   useEnsName,
-  useBalance,
+  UseBalanceReturnType,
+  UseReadContractReturnType,
 } from "wagmi";
 import { Button } from "../ui";
-import { useEffect } from "react";
+import {
+  useNativeBalance,
+  useTokenBalances,
+  useTokenBalances2,
+} from "@/hooks/useBalances";
 
 export function Account() {
   const { address, connector } = useAccount();
@@ -16,26 +22,28 @@ export function Account() {
   const { data: ensName } = useEnsName({ address });
   const { data: ensAvatar } = useEnsAvatar({ name: ensName! });
 
-  // Fetch balance data
-  const {
-    data: balanceData,
-    isError,
-    isLoading,
-  } = useBalance({
-    address,
-  });
+  const nativeBalance: UseBalanceReturnType = useNativeBalance(address);
+  const tokenBalances: UseBalanceReturnType[] = useTokenBalances(address);
+  const tokenBalances2: UseReadContractReturnType = useTokenBalances2(address);
 
   const formattedAddress = formatAddress(address);
 
-  // Log balance data when it changes
+  // Log the balance data to the console
   useEffect(() => {
-    if (balanceData) {
-      console.log("Balance Data:", balanceData);
-      // JSON.stringify doesn't handle BigInts well, so we need to convert them to strings
-      console.log(JSON.stringify(serializeBalanceData(balanceData), null, 2));
+    if (nativeBalance.data) {
+      console.log("Native Balance:", serializeBalanceData(nativeBalance.data));
     }
-  }, [balanceData]);
 
+    tokenBalances.forEach(({ data }, index) => {
+      if (data) {
+        console.log(`Token Balance ${index}:`, serializeBalanceData(data));
+      }
+    });
+
+    console.log(">>>> Token Balances 2:", tokenBalances2.data);
+  }, [nativeBalance.data, tokenBalances]);
+
+  // Serialize the balance data to log BigInt values
   const serializeBalanceData = (data: any) => {
     if (!data) return null;
     return {
@@ -62,19 +70,35 @@ export function Account() {
               {ensName ? `${ensName} (${formattedAddress})` : formattedAddress}
             </div>
           )}
-
-          {isLoading ? (
+          <div className="text-xs text-gray-500">
+            Connected to {connector?.name} Connector
+          </div>
+          {nativeBalance.isLoading ? (
             <div className="text-xs text-gray-500">Loading balance...</div>
-          ) : isError ? (
+          ) : nativeBalance.isError ? (
             <div className="text-xs text-red-500">Failed to fetch balance</div>
           ) : (
             <div className="text-sm font-medium text-white-900">
-              Balance: {balanceData?.formatted} {balanceData?.symbol}
+              Native Balance: {nativeBalance.data?.formatted}{" "}
+              {nativeBalance.data?.symbol}
             </div>
           )}
 
-          <div className="text-xs text-gray-500">
-            Connected to {connector?.name} Connector
+          <div className="text-sm font-medium text-white-900 mt-4">
+            Token Balances:
+            {tokenBalances.map(({ data, isLoading, isError }, index) => (
+              <div key={index}>
+                {isLoading ? (
+                  <div>Loading balance for token...</div>
+                ) : isError ? (
+                  <div>Failed to fetch balance for token </div>
+                ) : (
+                  <div>
+                    Token{[index]} Balance: {data?.formatted} {data?.symbol}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>

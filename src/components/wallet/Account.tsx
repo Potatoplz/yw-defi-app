@@ -14,7 +14,9 @@ import {
   useNativeBalance,
   useTokenBalances,
   useTokenBalances2,
+  useTokenBalances3,
 } from "@/hooks/useBalances";
+import { useApproveToken } from "@/hooks/useApproveToken";
 
 export function Account() {
   const { address, connector } = useAccount();
@@ -25,6 +27,11 @@ export function Account() {
   const nativeBalance: UseBalanceReturnType = useNativeBalance(address);
   const tokenBalances: UseBalanceReturnType[] = useTokenBalances(address);
   const tokenBalances2: UseReadContractReturnType = useTokenBalances2(address);
+  const {
+    data: tokenBalances3,
+    isError,
+    isLoading,
+  } = useTokenBalances3(address);
 
   const formattedAddress = formatAddress(address);
 
@@ -41,7 +48,8 @@ export function Account() {
     });
 
     console.log(">>>> Token Balances 2:", tokenBalances2.data);
-  }, [nativeBalance.data, tokenBalances]);
+    console.log(">>>> Token Balances 3:", tokenBalances3);
+  }, [nativeBalance.data, tokenBalances, tokenBalances2.data, tokenBalances3]);
 
   // Serialize the balance data to log BigInt values
   const serializeBalanceData = (data: any) => {
@@ -99,6 +107,27 @@ export function Account() {
                 )}
               </div>
             ))}
+          </div>
+
+          {/* 3 */}
+          <div className="text-sm font-medium text-white-900 mt-4">
+            Token Balances 3:
+            {isLoading ? (
+              <div>Loading token balances...</div>
+            ) : isError ? (
+              <div>Failed to fetch token balances</div>
+            ) : (
+              tokenBalances3 &&
+              tokenBalances3.map((balance: any, index) => (
+                <div key={index}>
+                  {index % 2 === 0 ? (
+                    <div>Balance: {balance.result.toString()}</div>
+                  ) : (
+                    <div>Symbol: {balance.result}</div>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

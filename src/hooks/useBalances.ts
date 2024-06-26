@@ -3,6 +3,8 @@ import {
   UseBalanceReturnType,
   useReadContracts,
   UseReadContractReturnType,
+  useWriteContract,
+  useSimulateContract,
 } from "wagmi";
 import { erc20Abi } from "viem";
 
@@ -12,7 +14,7 @@ export const useTokenBalances = (
 ): UseBalanceReturnType[] => {
   const tokens: any = [
     "0x538b2B6026D2b23c596677920fFd4b4bD82a0b17", // tAAA
-    "0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
+    "0x6b7792E45F9e18CFb358166A7D4523aA75e8867e", // tBBB
     // Add more token addresses here
   ];
 
@@ -62,6 +64,41 @@ export const useTokenBalances2 = (address?: `0x${string}`) => {
   });
 
   return balance;
+};
+
+// 3번째 방법
+const testTokenContracts = [
+  {
+    address: "0x538b2B6026D2b23c596677920fFd4b4bD82a0b17", // tAAA
+    abi: erc20Abi,
+  },
+  {
+    address: "0x6b7792E45F9e18CFb358166A7D4523aA75e8867e", // tBBB
+    abi: erc20Abi,
+  },
+] as const;
+
+export const useTokenBalances3 = (
+  address?: `0x${string}`,
+  spender?: any,
+  amount?: any
+) => {
+  const contracts = testTokenContracts.flatMap((testTokenContract) => [
+    {
+      ...testTokenContract,
+      functionName: "balanceOf",
+      args: [address],
+    },
+    {
+      ...testTokenContract,
+      functionName: "symbol",
+    },
+  ]);
+  const balances = useReadContracts({
+    contracts,
+  });
+
+  return balances;
 };
 
 // This hook returns the native balance of a given address.

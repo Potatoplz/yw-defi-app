@@ -1,72 +1,74 @@
 import { useState } from "react";
-import { useApproveToken } from "@/hooks/useApproveToken";
 import { Button } from "../ui";
+import { ApproveToken } from "./ApproveToken";
+import { ethers } from "ethers";
+import { useWalletClient } from "wagmi";
 
 import {
   SINGLE_DEPOSIT_ABI,
   SINGLE_DEPOSIT_CONTRACT_ADDRESS,
 } from "@/contracts/singleDeposit/singleDepositFuji";
 
-const allowedTokens = [
-  { address: "0x538b2B6026D2b23c596677920fFd4b4bD82a0b17", symbol: "tAAA" },
-  { address: "0x6b7792E45F9e18CFb358166A7D4523aA75e8867e", symbol: "tBBB" },
-];
-
 function SingleDeposit() {
   const [selectedToken, setSelectedToken] = useState<`0x${string}` | null>(
     null
   );
-  const [spender] = useState<`0x${string}`>(SINGLE_DEPOSIT_CONTRACT_ADDRESS); // 스펜더 주소는 계약 주소로 설정
   const [amount, setAmount] = useState<string>(""); // 사용자 입력 금액
+  const [isApproved, setIsApproved] = useState(false);
+  const { data: walletClient } = useWalletClient();
 
-  const { approveToken, isApproving, isApproved, error } = useApproveToken(
-    selectedToken,
-    BigInt(amount ? (parseFloat(amount) * 10 ** 18).toString() : "0"), // ERC20 토큰은 18자리 소수점 이하를 사용하므로 10^18을 곱해준다.
-    spender
-  );
+  const handleApproved = () => {
+    console.log("Approved!");
 
-  const handleApprove = () => {
-    if (selectedToken && amount) {
-      approveToken();
+    setIsApproved(true);
+  };
+
+  const handleDeposit = async () => {
+    const weiAmount = ethers.parseEther(amount);
+    console.log("Deposit amount:", weiAmount.toString());
+
+    if (selectedToken && weiAmount && isApproved && walletClient) {
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        SINGLE_DEPOSIT_CONTRACT_ADDRESS,
+        SINGLE_DEPOSIT_ABI,
+        signer
+      );
+
+      try {
+        const tx = await contract.stake(selectedToken, weiAmount);
+        const depositResult = await tx.wait();
+        console.log("Deposit result:", depositResult);
+
+        console.log("Successfully deposited!");
+      } catch (error) {
+        console.error("Deposit failed:", error);
+      }
     }
   };
 
   return (
     <div className="bg-black p-4 rounded-lg text-white">
-      <h2 className="text-lg font-medium">Approve Deposit Token</h2>
-      <select
-        className="mt-2 p-2 bg-gray-800 text-white rounded"
-        onChange={(e) => setSelectedToken(e.target.value as `0x${string}`)}
-      >
-        <option value="">Select Token</option>
-        {allowedTokens.map((token) => (
-          <option key={token.address} value={token.address}>
-            {token.symbol}
-          </option>
-        ))}
-      </select>
-      <input
-        type="number"
-        className="mt-2 p-2 bg-gray-800 text-white rounded"
-        placeholder="Enter amount"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
+      <ApproveToken
+        onApproved={handleApproved}
+        selectedToken={selectedToken}
+        setSelectedToken={setSelectedToken}
+        amount={amount}
+        setAmount={setAmount}
+        contractAddress={SINGLE_DEPOSIT_CONTRACT_ADDRESS}
       />
-      <Button
-        color="blue"
-        onClick={handleApprove}
-        disabled={!selectedToken || isApproving || !amount}
-      >
-        {isApproving ? "Approving..." : "Approve"}
-      </Button>
-      {isApproved && selectedToken && (
-        <div className="text-sm text-green-500 mt-2">
-          Token {allowedTokens.find((t) => t.address === selectedToken)?.symbol}{" "}
-          approved!
-        </div>
-      )}
-      {error && (
-        <div className="text-sm text-red-500 mt-2">{error.message}</div>
+      {isApproved && (
+        <>
+          <h2 className="text-lg font-medium mt-4">Deposit Token</h2>
+          <Button
+            color="green"
+            onClick={handleDeposit}
+            disabled={!selectedToken || !amount}
+          >
+            Deposit
+          </Button>
+        </>
       )}
     </div>
   );

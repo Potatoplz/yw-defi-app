@@ -4,7 +4,7 @@ import { useAccount, useWalletClient } from "wagmi";
 import { erc20Abi } from "viem";
 
 export const useApproveToken = (
-  // tokenAddress: `0x${string}`,
+  // tokenAddress: `0x${string}` | null,
   tokenAddress: any,
   amount: bigint,
   spender: `0x${string}`
@@ -43,5 +43,32 @@ export const useApproveToken = (
     }
   };
 
-  return { approveToken, isApproving, isApproved, error };
+  const removeApproval = async () => {
+    if (!isConnected || !walletClient) {
+      setError(new Error("Wallet is not connected"));
+      return;
+    }
+
+    setIsApproving(true);
+    setError(null);
+
+    try {
+      const provider = new ethers.BrowserProvider(walletClient);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
+      const tx = await contract.approve(spender, 0); // 승인 초기화
+      await tx.wait();
+      setIsApproved(false);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error("An unknown error occurred"));
+      }
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  return { approveToken, removeApproval, isApproving, isApproved, error };
 };

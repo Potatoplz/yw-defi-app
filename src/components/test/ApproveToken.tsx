@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useApproveToken } from "@/hooks/useApproveToken";
 import { Button } from "../ui";
-import { on } from "events";
 
 const allowedTokens = [
   { address: "0x538b2B6026D2b23c596677920fFd4b4bD82a0b17", symbol: "tAAA" },
@@ -27,11 +26,12 @@ export function ApproveToken({
 }: ApproveTokenProps) {
   const [spender] = useState<`0x${string}`>(contractAddress); // 스펜더 주소는 계약 주소로 설정
 
-  const { approveToken, isApproving, isApproved, error } = useApproveToken(
-    selectedToken,
-    BigInt(amount ? (parseFloat(amount) * 10 ** 18).toString() : "0"),
-    spender
-  );
+  const { approveToken, removeApproval, isApproving, isApproved, error } =
+    useApproveToken(
+      selectedToken,
+      BigInt(amount ? (parseFloat(amount) * 10 ** 18).toString() : "0"),
+      spender
+    );
 
   // 방법 1
   // useEffect(() => {
@@ -44,6 +44,7 @@ export function ApproveToken({
   // 방법 2
   const handleApprove = async () => {
     if (selectedToken && amount) {
+      // 승인 요청
       await approveToken().then(
         () => {
           onApproved();
@@ -52,6 +53,12 @@ export function ApproveToken({
           console.error("Approve failed:", error);
         }
       );
+    }
+  };
+
+  const handleRemoveApproval = async () => {
+    if (selectedToken) {
+      await removeApproval();
     }
   };
 
@@ -83,6 +90,13 @@ export function ApproveToken({
         disabled={!selectedToken || isApproving || !amount}
       >
         {isApproving ? "Approving..." : "Approve"}
+      </Button>
+      <Button
+        color="red"
+        onClick={handleRemoveApproval}
+        disabled={!selectedToken || isApproving}
+      >
+        Remove Approval
       </Button>
       {isApproved && selectedToken && (
         <div className="text-sm text-green-500 mt-2">

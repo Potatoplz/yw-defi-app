@@ -43,6 +43,7 @@ export const useApproveToken = (
     }
   };
 
+  // TODO: 이게 되나....?
   const removeApproval = async () => {
     if (!isConnected || !walletClient) {
       setError(new Error("Wallet is not connected"));

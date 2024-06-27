@@ -74,25 +74,27 @@ function SingleDeposit() {
         setAmount={setAmount}
         contractAddress={SINGLE_DEPOSIT_CONTRACT_ADDRESS}
       />
-      {/* {isApproved && ( */}
-      <>
-        <h2 className="text-lg font-medium mt-4">Deposit Token</h2>
-        <Button
-          color="green"
-          onClick={handleDeposit}
-          disabled={!selectedToken || !amount}
-        >
-          Deposit
-        </Button>
-        <Button
-          color="blue"
-          onClick={handleAllowedTokens}
-          disabled={!selectedToken}
-        >
-          Enable Token
-        </Button>
-      </>
-      {/* )} */}
+      <h2 className="text-lg font-medium mt-4">Enable Token</h2>
+
+      <Button
+        color="blue"
+        onClick={handleAllowedTokens}
+        disabled={!selectedToken}
+      >
+        Enable Token
+      </Button>
+      {isApproved && (
+        <>
+          <h2 className="text-lg font-medium mt-4">Deposit Token</h2>
+          <Button
+            color="green"
+            onClick={handleDeposit}
+            disabled={!selectedToken || !amount}
+          >
+            Deposit
+          </Button>
+        </>
+      )}
     </div>
   );
 }

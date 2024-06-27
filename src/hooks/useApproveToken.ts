@@ -4,7 +4,8 @@ import { useAccount, useWalletClient } from "wagmi";
 import { erc20Abi } from "viem";
 
 export const useApproveToken = (
-  tokenAddress: `0x${string}`,
+  // tokenAddress: `0x${string}`,
+  tokenAddress: any,
   amount: bigint,
   spender: `0x${string}`
 ) => {

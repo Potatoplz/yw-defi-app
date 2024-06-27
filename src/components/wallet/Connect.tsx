@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { Connector, useChainId, useConnect } from "wagmi";
 import { Button } from "../ui";
 
+// Connect component: Displays the available connectors to connect the wallet.
 export function Connect() {
+  /**
+   * useChainId hook: Returns the chain ID of the current network.
+   * The current network is determined by the WagmiProvider component.
+   */
   const chainId = useChainId();
   const { connectors, connect } = useConnect();
 

@@ -66,7 +66,7 @@ export function ApproveToken({
     <>
       <h2 className="text-lg font-medium mt-4">Approve Deposit Token</h2>
       <select
-        className="mt-2 p-2 bg-gray-800 text-white rounded"
+        className="mt-2 p-2 bg-white text-black border border-gray-300 rounded"
         value={selectedToken || ""}
         onChange={(e) => setSelectedToken(e.target.value as `0x${string}`)}
       >
@@ -79,7 +79,7 @@ export function ApproveToken({
       </select>
       <input
         type="number"
-        className="mt-2 p-2 bg-gray-800 text-white rounded"
+        className="mt-2 p-2 bg-white text-black border border-gray-300 rounded"
         placeholder="Enter amount"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}

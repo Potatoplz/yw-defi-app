@@ -40,11 +40,11 @@ export function Account() {
   };
 
   return (
-    <div className="flex flex-col items-start space-y-4 bg-black p-4 rounded-lg text-white">
+    <div className="flex flex-col items-start space-y-4 bg-white p-4 rounded-lg text-black">
       <div className="flex items-center space-x-4">
         <div className="flex flex-col">
           {address && (
-            <div className="text-sm font-medium text-white">{address}</div>
+            <div className="text-sm font-medium text-black">{address}</div>
           )}
           <div className="text-xs text-gray-500">
             Connected to {connector?.name} Connector
@@ -56,12 +56,12 @@ export function Account() {
       ) : nativeBalance.isError ? (
         <div className="text-xs text-red-500">Failed to fetch balance</div>
       ) : (
-        <div className="text-sm font-medium text-white">
+        <div className="text-sm font-medium text-black">
           Native Balance: {nativeBalance.data?.formatted}{" "}
           {nativeBalance.data?.symbol}
         </div>
       )}
-      <div className="text-sm font-medium text-white mt-4">
+      <div className="text-sm font-medium text-black mt-4">
         Token Balances:
         {tokenBalances.map(({ data, isLoading, isError }, index) => (
           <div key={index}>

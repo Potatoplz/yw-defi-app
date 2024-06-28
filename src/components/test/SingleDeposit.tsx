@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Button } from "../ui";
 import { ApproveToken } from "./ApproveToken";
@@ -166,7 +168,7 @@ function SingleDeposit() {
   }, [loading, contract]);
 
   return (
-    <div className="bg-black p-4 rounded-lg text-white">
+    <div className="bg-white p-4 rounded-lg text-black">
       <h1 className="text-xl font-medium">Single Deposit</h1>
       <h2 className="text-lg font-medium mt-4">My rewards</h2>
       <p>{rewardTokens}</p>

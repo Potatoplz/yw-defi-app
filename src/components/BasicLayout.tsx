@@ -6,7 +6,7 @@ const BasicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <>
       <Navbar />
-      <main>{children}</main>
+      <main className="container mx-auto px-4">{children}</main>
     </>
   );
 };

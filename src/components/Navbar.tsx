@@ -53,14 +53,14 @@ const Navbar: React.FC = () => {
         <div className="hidden lg:flex lg:items-center lg:justify-end">
           {isConnected ? (
             <button
-              className="text-white border border-white px-4 py-2 rounded"
+              className="text-white border border-white px-4 py-2"
               onClick={() => setIsModalOpen(true)}
             >
               Connected
             </button>
           ) : (
             <button
-              className="text-gray-800 bg-white px-4 py-2 rounded"
+              className="text-white border border-white px-4 py-2"
               onClick={() => setIsModalOpen(true)}
             >
               Wallet Connect

@@ -63,8 +63,8 @@ export function ApproveToken({
   };
 
   return (
-    <div className="bg-black p-4 rounded-lg text-white">
-      <h2 className="text-lg font-medium">Approve Deposit Token</h2>
+    <>
+      <h2 className="text-lg font-medium mt-4">Approve Deposit Token</h2>
       <select
         className="mt-2 p-2 bg-gray-800 text-white rounded"
         value={selectedToken || ""}
@@ -91,13 +91,13 @@ export function ApproveToken({
       >
         {isApproving ? "Approving..." : "Approve"}
       </Button>
-      <Button
+      {/* <Button
         color="red"
         onClick={handleRemoveApproval}
         disabled={!selectedToken || isApproving}
       >
         Remove Approval
-      </Button>
+      </Button> */}
       {isApproved && selectedToken && (
         <div className="text-sm text-green-500 mt-2">
           Token {allowedTokens.find((t) => t.address === selectedToken)?.symbol}{" "}
@@ -107,6 +107,6 @@ export function ApproveToken({
       {error && (
         <div className="text-sm text-red-500 mt-2">{error.message}</div>
       )}
-    </div>
+    </>
   );
 }

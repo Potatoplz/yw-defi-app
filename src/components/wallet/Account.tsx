@@ -71,13 +71,13 @@ export function Account() {
               <div>Failed to fetch balance for token </div>
             ) : (
               <div>
-                Token{[index]} Balance: {data?.formatted} {data?.symbol}
+                {data?.formatted} {data?.symbol}
               </div>
             )}
           </div>
         ))}
       </div>
-      <div className="text-sm font-medium text-white mt-4">
+      {/* <div className="text-sm font-medium text-white mt-4">
         Token Balances 2:
         {!tokenBalances2Data || tokenBalances2Data.length === 0 ? (
           <div>Loading token balances...</div>
@@ -101,7 +101,7 @@ export function Account() {
             ) : null
           )
         )}
-      </div>
+      </div> */}
       <Button color="red" onClick={() => disconnect()}>
         Disconnect
       </Button>

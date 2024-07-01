@@ -5,6 +5,7 @@ import { Button } from "@/shared/components/ui";
 import { ApproveToken } from "./ApproveToken";
 import { ethers } from "ethers";
 import { useContract } from "@/shared/hooks/useContract";
+import { AsyncState } from "@/shared/hooks/useAsyncState";
 
 import {
   Token,
@@ -23,7 +24,7 @@ const allowedTokens: Token[] = JSON.parse(
 );
 
 function SingleDeposit() {
-  const { contract, loading, address } = useContract(
+  const { contract, state, error, address } = useContract(
     SINGLE_DEPOSIT_CONTRACT_ADDRESS,
     SINGLE_DEPOSIT_ABI
   );
@@ -40,13 +41,15 @@ function SingleDeposit() {
   );
   const [message, setMessage] = useState<Message>(null);
 
+  // TODO: 나중에 연결
   const handleApproved = () => {
     console.log("Approved!");
     setIsApproved(true);
   };
 
   const handleDeposit = async () => {
-    if (loading || !contract || !selectedToken || !amount) return;
+    if (state === AsyncState.LOADING || !contract || !selectedToken || !amount)
+      return;
 
     const weiAmount = ethers.parseEther(amount);
     console.log("Deposit amount:", weiAmount.toString());
@@ -56,13 +59,10 @@ function SingleDeposit() {
       setMessage(null);
 
       const tx = await contract.stake(selectedToken, weiAmount);
-      console.log("Deposit transaction:", tx);
-
       const depositResult = await tx.wait();
       console.log("Deposit result:", depositResult);
 
-      console.log("Successfully deposited!");
-
+      // TODO: Refactoring required
       const tokenSymbol = allowedTokens.find(
         (t) => t.address === selectedToken
       )?.symbol;
@@ -81,9 +81,8 @@ function SingleDeposit() {
     }
   };
 
-  // 토큰 활성화
   const handleAllowedTokens = async () => {
-    if (loading || !contract) return;
+    if (state === AsyncState.LOADING || !contract) return;
 
     try {
       const tx = await contract.enableDepositToken(selectedToken);
@@ -95,7 +94,7 @@ function SingleDeposit() {
   };
 
   const getUserStakedTokens = async () => {
-    if (loading || !contract) return;
+    if (state === AsyncState.LOADING || !contract) return;
 
     try {
       const stakedData = await Promise.all(
@@ -115,7 +114,7 @@ function SingleDeposit() {
   };
 
   const getAllAllowedDepositTokens = async () => {
-    if (loading || !contract) return;
+    if (state === AsyncState.LOADING || !contract) return;
 
     try {
       const tokens = await contract.getAllAllowedDepositTokens();
@@ -126,7 +125,7 @@ function SingleDeposit() {
   };
 
   const getDepositReward = async () => {
-    if (loading || !contract) return;
+    if (state === AsyncState.LOADING || !contract) return;
 
     try {
       const userClamiabletAAA = await contract.estimateReward2(
@@ -159,12 +158,12 @@ function SingleDeposit() {
   };
 
   useEffect(() => {
-    if (!loading) {
+    if (state !== AsyncState.LOADING) {
       getUserStakedTokens();
       getAllAllowedDepositTokens();
       getDepositReward();
     }
-  }, [loading, contract]);
+  }, [state, contract]);
 
   return (
     <div className="bg-white p-4 rounded-lg text-black">

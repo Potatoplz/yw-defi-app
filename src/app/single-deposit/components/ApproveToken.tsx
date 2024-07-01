@@ -1,20 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useApproveToken } from "@/shared/hooks/useApproveToken";
 import { Button } from "@/shared/components/ui";
+import { Token, ApproveTokenProps } from "../types/singleDepositTypes";
+import { AsyncState } from "@/shared/hooks/useAsyncState";
 
-const allowedTokens = [
-  { address: "0x538b2B6026D2b23c596677920fFd4b4bD82a0b17", symbol: "tAAA" },
-  { address: "0x6b7792E45F9e18CFb358166A7D4523aA75e8867e", symbol: "tBBB" },
-];
-
-interface ApproveTokenProps {
-  onApproved: () => void;
-  selectedToken: `0x${string}` | null;
-  setSelectedToken: (token: `0x${string}` | null) => void;
-  amount: string;
-  setAmount: (amount: string) => void;
-  contractAddress: `0x${string}`;
-}
+const allowedTokens: Token[] = JSON.parse(
+  process.env.NEXT_PUBLIC_ALLOWED_TOKENS || "[]"
+);
 
 export function ApproveToken({
   onApproved,
@@ -24,41 +16,26 @@ export function ApproveToken({
   setAmount,
   contractAddress,
 }: ApproveTokenProps) {
-  const [spender] = useState<`0x${string}`>(contractAddress); // 스펜더 주소는 계약 주소로 설정
+  const [spender] = useState<`0x${string}`>(contractAddress);
 
-  const { approveToken, removeApproval, isApproving, isApproved, error } =
-    useApproveToken(
-      selectedToken,
-      BigInt(amount ? (parseFloat(amount) * 10 ** 18).toString() : "0"),
-      spender
-    );
+  const { approveToken, state, error } = useApproveToken(
+    selectedToken,
+    BigInt(amount ? (parseFloat(amount) * 10 ** 18).toString() : "0"),
+    spender
+  );
 
-  // 방법 1
-  // useEffect(() => {
-  //   if (isApproved) {
-  //     console.log("ApproveToken.tsx2: Token approved!");
-  //     onApproved();
-  //   }
-  // }, [isApproved, onApproved]);
-
-  // 방법 2
   const handleApprove = async () => {
     if (selectedToken && amount) {
-      // 승인 요청
       await approveToken().then(
         () => {
-          onApproved();
+          if (state === AsyncState.SUCCESS) {
+            onApproved();
+          }
         },
         (error) => {
           console.error("Approve failed:", error);
         }
       );
-    }
-  };
-
-  const handleRemoveApproval = async () => {
-    if (selectedToken) {
-      await removeApproval();
     }
   };
 
@@ -87,24 +64,17 @@ export function ApproveToken({
       <Button
         color="blue"
         onClick={handleApprove}
-        disabled={!selectedToken || isApproving || !amount}
+        disabled={!selectedToken || state === AsyncState.LOADING || !amount}
       >
-        {isApproving ? "Approving..." : "Approve"}
+        {state === AsyncState.LOADING ? "Approving..." : "Approve"}
       </Button>
-      {/* <Button
-        color="red"
-        onClick={handleRemoveApproval}
-        disabled={!selectedToken || isApproving}
-      >
-        Remove Approval
-      </Button> */}
-      {isApproved && selectedToken && (
+      {state === AsyncState.SUCCESS && selectedToken && (
         <div className="text-sm text-green-500 mt-2">
           Token {allowedTokens.find((t) => t.address === selectedToken)?.symbol}{" "}
           approved!
         </div>
       )}
-      {error && (
+      {state === AsyncState.ERROR && error && (
         <div className="text-sm text-red-500 mt-2">{error.message}</div>
       )}
     </>

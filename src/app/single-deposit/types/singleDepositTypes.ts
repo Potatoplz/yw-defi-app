@@ -19,3 +19,12 @@ export type Message = {
   type: "success" | "error";
   content: string;
 } | null;
+
+export interface ApproveTokenProps {
+  onApproved: () => void;
+  selectedToken: `0x${string}` | null;
+  setSelectedToken: (token: `0x${string}` | null) => void;
+  amount: string;
+  setAmount: (amount: string) => void;
+  contractAddress: `0x${string}`;
+}

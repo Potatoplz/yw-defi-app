@@ -1,75 +1,50 @@
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { erc20Abi } from "viem";
+import { useContract } from "@/shared/hooks/useContract";
+import { useAsyncState, AsyncState } from "@/shared/hooks/useAsyncState";
 
 export const useApproveToken = (
-  // tokenAddress: `0x${string}` | null,
-  tokenAddress: any,
+  tokenAddress: `0x${string}` | null,
   amount: bigint,
   spender: `0x${string}`
 ) => {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
 
-  const [isApproving, setIsApproving] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const {
+    contract,
+    state: contractState,
+    error: contractError,
+  } = useContract(tokenAddress, erc20Abi);
+  const { state, error, setLoading, setSuccess, setErrorState } =
+    useAsyncState();
 
   const approveToken = async () => {
     if (!isConnected || !walletClient) {
-      setError(new Error("Wallet is not connected"));
+      setErrorState(new Error("Wallet is not connected"));
       return;
     }
 
-    setIsApproving(true);
-    setError(null);
+    if (contractState === AsyncState.LOADING || !contract) {
+      setErrorState(new Error("Contract is not ready"));
+      return;
+    }
+
+    setLoading();
 
     try {
-      const provider = new ethers.BrowserProvider(walletClient);
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
       const tx = await contract.approve(spender, amount);
       await tx.wait();
-      setIsApproved(true);
+      setSuccess();
     } catch (err) {
       if (err instanceof Error) {
-        setError(err);
+        setErrorState(err);
       } else {
-        setError(new Error("An unknown error occurred"));
+        setErrorState(new Error("An unknown error occurred"));
       }
-    } finally {
-      setIsApproving(false);
     }
   };
 
-  // TODO: 이게 되나....?
-  const removeApproval = async () => {
-    if (!isConnected || !walletClient) {
-      setError(new Error("Wallet is not connected"));
-      return;
-    }
-
-    setIsApproving(true);
-    setError(null);
-
-    try {
-      const provider = new ethers.BrowserProvider(walletClient);
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
-      const tx = await contract.approve(spender, 0); // 승인 초기화
-      await tx.wait();
-      setIsApproved(false);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error("An unknown error occurred"));
-      }
-    } finally {
-      setIsApproving(false);
-    }
-  };
-
-  return { approveToken, removeApproval, isApproving, isApproved, error };
+  return { approveToken, state, error };
 };

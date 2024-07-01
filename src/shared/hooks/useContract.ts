@@ -1,36 +1,47 @@
 import { useEffect, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { ethers } from "ethers";
+import { useAsyncState, AsyncState } from "@/shared/hooks/useAsyncState";
 
-// useContract hook: Fetches the contract instance using the contract address and ABI.
-export function useContract(contractAddress: string, contractABI: any) {
+export function useContract(contractAddress: any, contractABI: any) {
   const { address, isConnected, connector, chain } = useAccount(); // chain 추가
   const { data: walletClient } = useWalletClient();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { state, error, setLoading, setSuccess, setErrorState } =
+    useAsyncState();
 
   useEffect(() => {
     async function initContract() {
       if (isConnected && walletClient) {
-        console.log(">>> Connected Chain: ", chain);
+        try {
+          setLoading();
 
-        const provider = new ethers.BrowserProvider(walletClient);
-        const signer = await provider.getSigner();
-        const contractInstance = new ethers.Contract(
-          contractAddress,
-          contractABI,
-          signer
-        );
+          console.log(">>> Connected Chain: ", chain);
 
-        // console.log(">>> Contract instance: ", contractInstance);
+          const provider = new ethers.BrowserProvider(walletClient);
+          const signer = await provider.getSigner();
+          const contractInstance = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
 
-        setContract(contractInstance);
-        setLoading(false);
+          // console.log(">>> Contract instance: ", contractInstance);
+
+          setContract(contractInstance);
+          setSuccess();
+        } catch (err) {
+          if (err instanceof Error) {
+            setErrorState(err);
+          } else {
+            setErrorState(new Error("An unknown error occurred"));
+          }
+        }
       }
     }
 
     initContract();
   }, [isConnected, walletClient, contractAddress, contractABI, chain?.id]);
 
-  return { contract, loading, address, connector };
+  return { contract, state, error, address, connector };
 }

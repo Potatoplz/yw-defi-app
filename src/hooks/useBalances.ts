@@ -8,7 +8,13 @@ import {
 } from "wagmi";
 import { erc20Abi } from "viem";
 
-// useBalance hook: Fetches the balance of a given address and token. [Deprecated]
+/**
+ * Deprecated useBalance token parameter.
+ * Moving forward, useBalance will only work for native currencies,
+ * thus the token parameter is no longer supported.
+ * Use useReadContracts instead.
+ * https://wagmi.sh/react/guides/migrate-from-v1-to-v2#deprecated-usebalance-token-parameter
+ */
 export const useTokenBalances = (
   address?: `0x${string}`
 ): UseBalanceReturnType[] => {
@@ -40,6 +46,7 @@ const testTokenContracts = [
   },
 ] as const;
 
+// TODO: Refactoring required
 export const useTokenBalances2 = (
   address?: `0x${string}`,
   spender?: any,
@@ -54,6 +61,14 @@ export const useTokenBalances2 = (
     {
       ...testTokenContract,
       functionName: "symbol",
+    },
+    {
+      ...testTokenContract,
+      functionName: "decimals",
+    },
+    {
+      ...testTokenContract,
+      functionName: "name",
     },
   ]);
   const balances = useReadContracts({

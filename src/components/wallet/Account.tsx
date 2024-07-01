@@ -17,19 +17,19 @@ export function Account() {
   const tokenBalances: UseBalanceReturnType[] = useTokenBalances(address);
   const { data: tokenBalances2Data } = useTokenBalances2(address);
 
-  // useEffect(() => {
-  //   if (nativeBalance.data) {
-  //     console.log("Native Balance:", serializeBalanceData(nativeBalance.data));
-  //   }
+  useEffect(() => {
+    if (nativeBalance.data) {
+      console.log("Native Balance:", serializeBalanceData(nativeBalance.data));
+    }
 
-  //   tokenBalances.forEach(({ data }, index) => {
-  //     if (data) {
-  //       console.log(`Token Balance ${index}:`, serializeBalanceData(data));
-  //     }
-  //   });
+    tokenBalances.forEach(({ data }, index) => {
+      if (data) {
+        console.log(`Token Balance ${index}:`, serializeBalanceData(data));
+      }
+    });
 
-  //   console.log(">>>> Token Balances 2:", tokenBalances2Data);
-  // }, [nativeBalance.data, tokenBalances, tokenBalances2Data]);
+    console.log(">>>> Token Balances 2:", tokenBalances2Data);
+  }, [nativeBalance.data, tokenBalances, tokenBalances2Data]);
 
   const serializeBalanceData = (data: any) => {
     if (!data) return null;

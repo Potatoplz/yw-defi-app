@@ -1,9 +1,9 @@
 // src/components/test/ConnectModal.tsx
 import React from "react";
 import { useAccount } from "wagmi";
-import { Modal } from "../ui";
-import { Connect } from "../wallet/Connect";
-import { Account } from "../wallet/Account";
+import { Modal } from "@/shared/components/ui";
+import { Connect } from "@/app/wallet/components/Connect";
+import { Account } from "@/app/wallet/components/Account";
 
 interface ConnectModalProps {
   isOpen: boolean;

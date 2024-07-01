@@ -1,9 +1,9 @@
 // Global layout for all pages
 "use client";
 
-import "../styles/globals.css";
+import "@/shared/styles/globals.css";
 import { RecoilRoot } from "recoil";
-import BasicLayout from "../components/BasicLayout";
+import BasicLayout from "@/shared/components/BasicLayout";
 import { WagmiProvider } from "wagmi";
 import { WagmiConfig } from "@/utils/wagmi/WagmiConfig";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

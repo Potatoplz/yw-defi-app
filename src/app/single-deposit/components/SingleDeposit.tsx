@@ -1,38 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "../ui";
+import { Button } from "@/shared/components/ui";
 import { ApproveToken } from "./ApproveToken";
 import { ethers } from "ethers";
-import { useContract } from "@/hooks/useContract";
-import { useAccount } from "wagmi";
+import { useContract } from "@/shared/hooks/useContract";
+
+import {
+  Token,
+  StakedTokens,
+  PromiseState,
+  Message,
+} from "../types/singleDepositTypes";
 
 import {
   SINGLE_DEPOSIT_ABI,
   SINGLE_DEPOSIT_CONTRACT_ADDRESS,
 } from "@/contracts/singleDeposit/singleDepositFuji";
-
-// TODO: types 디렉토리 어디에 위치시킬지 결정
-interface Token {
-  address: `0x${string}`;
-  symbol: string;
-}
-
-interface StakedTokens {
-  [symbol: string]: string;
-}
-
-enum PromiseState {
-  IDLE = "idle",
-  LOADING = "loading",
-  ERROR = "error",
-  FINISH = "finish",
-}
-
-type Message = {
-  type: "success" | "error";
-  content: string;
-} | null;
 
 const allowedTokens: Token[] = JSON.parse(
   process.env.NEXT_PUBLIC_ALLOWED_TOKENS || "[]"
@@ -70,9 +54,6 @@ function SingleDeposit() {
     try {
       setDepositState(PromiseState.LOADING);
       setMessage(null);
-
-      const tokens = await contract.getAllAllowedDepositTokens();
-      console.log("Allowed tokens:", tokens);
 
       const tx = await contract.stake(selectedToken, weiAmount);
       console.log("Deposit transaction:", tx);

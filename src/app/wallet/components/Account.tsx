@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { useAccount, useDisconnect, UseBalanceReturnType } from "wagmi";
-import { Button } from "../ui";
+import { Button } from "@/shared/components/ui";
 import {
   useNativeBalance,
   useTokenBalances,
   useTokenBalances2,
-} from "@/hooks/useBalances";
+} from "@/shared/hooks/useBalances";
 
 export function Account() {
   const { address, connector } = useAccount();

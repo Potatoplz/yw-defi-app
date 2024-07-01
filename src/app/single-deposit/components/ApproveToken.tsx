@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useApproveToken } from "@/hooks/useApproveToken";
-import { Button } from "../ui";
+import { useApproveToken } from "@/shared/hooks/useApproveToken";
+import { Button } from "@/shared/components/ui";
 
 const allowedTokens = [
   { address: "0x538b2B6026D2b23c596677920fFd4b4bD82a0b17", symbol: "tAAA" },

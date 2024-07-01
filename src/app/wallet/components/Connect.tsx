@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Connector, useChainId, useConnect } from "wagmi";
-import { Button } from "../ui";
+import { Button } from "@/shared/components/ui";
 
 // Connect component: Displays the available connectors to connect the wallet.
 export function Connect() {

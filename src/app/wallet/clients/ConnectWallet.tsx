@@ -1,9 +1,9 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import { Account } from "@/components/wallet/Account";
-import { Connect } from "@/components/wallet/Connect";
-import SingleDeposit from "@/components/test/SingleDeposit";
+import { Account } from "@/app/wallet/components/Account";
+import { Connect } from "@/app/wallet/components/Connect";
+import SingleDeposit from "@/app/single-deposit/components/SingleDeposit";
 import { useState, useEffect } from "react";
 
 export default function ConnectWallet() {

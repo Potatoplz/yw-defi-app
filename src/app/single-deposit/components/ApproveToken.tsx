@@ -42,6 +42,7 @@ export function ApproveToken({
   return (
     <>
       <h2 className="text-lg font-medium mt-4">Approve Deposit Token</h2>
+
       <select
         className="mt-2 p-2 bg-white text-black border border-gray-300 rounded"
         value={selectedToken || ""}
@@ -54,6 +55,7 @@ export function ApproveToken({
           </option>
         ))}
       </select>
+
       <input
         type="number"
         className="mt-2 p-2 bg-white text-black border border-gray-300 rounded"
@@ -61,6 +63,7 @@ export function ApproveToken({
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
       />
+
       <Button
         color="blue"
         onClick={handleApprove}
@@ -68,6 +71,7 @@ export function ApproveToken({
       >
         {state === AsyncState.LOADING ? "Approving..." : "Approve"}
       </Button>
+
       {state === AsyncState.SUCCESS && selectedToken && (
         <div className="text-sm text-green-500 mt-2">
           Token {allowedTokens.find((t) => t.address === selectedToken)?.symbol}{" "}

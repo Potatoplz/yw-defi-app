@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { ethers } from "ethers";
-import { useAsyncState, AsyncState } from "@/shared/hooks/useAsyncState";
+import { useAsyncState } from "@/shared/hooks/useAsyncState";
 
 export function useContract(contractAddress: any, contractABI: any) {
   const { address, isConnected, connector, chain } = useAccount(); // chain 추가

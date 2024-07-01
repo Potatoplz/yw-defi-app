@@ -12,14 +12,19 @@ import {
   SINGLE_DEPOSIT_CONTRACT_ADDRESS,
 } from "@/contracts/singleDeposit/singleDepositFuji";
 
-const allowedTokens = [
-  { address: "0x538b2B6026D2b23c596677920fFd4b4bD82a0b17", symbol: "tAAA" },
-  { address: "0x6b7792E45F9e18CFb358166A7D4523aA75e8867e", symbol: "tBBB" },
-];
+// TODO: types 디렉토리 어디에 위치시킬지 결정
+interface Token {
+  address: `0x${string}`;
+  symbol: string;
+}
 
-type StakedTokens = {
+interface StakedTokens {
   [symbol: string]: string;
-};
+}
+
+const allowedTokens: Token[] = JSON.parse(
+  process.env.NEXT_PUBLIC_ALLOWED_TOKENS || "[]"
+);
 
 function SingleDeposit() {
   const { contract, loading, address } = useContract(

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ConnectModal } from "./test/ConnectModal";
+import { ConnectModal } from "@/app/wallet/components/ConnectModal";
 import { useAccount } from "wagmi";
 
 const Navbar: React.FC = () => {

@@ -1,108 +1,83 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "../ui";
+import { Button } from "@/shared/components/ui";
 import { ApproveToken } from "./ApproveToken";
 import { ethers } from "ethers";
-import { useContract } from "@/hooks/useContract";
-import { useAccount } from "wagmi";
+import { useContract } from "@/shared/hooks/useContract";
+import { useAsyncState, AsyncState } from "@/shared/hooks/useAsyncState";
+
+import { Token, StakedTokens } from "../types/singleDepositTypes";
 
 import {
   SINGLE_DEPOSIT_ABI,
   SINGLE_DEPOSIT_CONTRACT_ADDRESS,
 } from "@/contracts/singleDeposit/singleDepositFuji";
 
-// TODO: types 디렉토리 어디에 위치시킬지 결정
-interface Token {
-  address: `0x${string}`;
-  symbol: string;
-}
-
-interface StakedTokens {
-  [symbol: string]: string;
-}
-
-enum PromiseState {
-  IDLE = "idle",
-  LOADING = "loading",
-  ERROR = "error",
-  FINISH = "finish",
-}
-
-type Message = {
-  type: "success" | "error";
-  content: string;
-} | null;
-
+// TODO: 꼭 파싱해서 써야하는지 확인
 const allowedTokens: Token[] = JSON.parse(
   process.env.NEXT_PUBLIC_ALLOWED_TOKENS || "[]"
 );
 
 function SingleDeposit() {
-  const { contract, loading, address } = useContract(
-    SINGLE_DEPOSIT_CONTRACT_ADDRESS,
-    SINGLE_DEPOSIT_ABI
-  );
+  const {
+    contract,
+    state: contractState,
+    error: contractError,
+    address,
+  } = useContract(SINGLE_DEPOSIT_CONTRACT_ADDRESS, SINGLE_DEPOSIT_ABI);
 
   const [stakedTokens, setStakedTokens] = useState<StakedTokens>({});
   const [rewardTokens, setRewardTokens] = useState<string>("");
   const [selectedToken, setSelectedToken] = useState<`0x${string}` | null>(
     null
   );
-  const [amount, setAmount] = useState<string>(""); // 사용자 입력 금액
+  const [amount, setAmount] = useState<string>("");
   const [isApproved, setIsApproved] = useState<boolean>(false);
-  const [depositState, setDepositState] = useState<PromiseState>(
-    PromiseState.IDLE
-  );
-  const [message, setMessage] = useState<Message>(null);
 
+  const {
+    state: depositState,
+    error: depositError,
+    setLoading: setDepositLoading,
+    setSuccess: setDepositSuccess,
+    setErrorState: setDepositError,
+  } = useAsyncState();
+
+  // TODO: 나중에연결
   const handleApproved = () => {
     console.log("Approved!");
     setIsApproved(true);
   };
 
   const handleDeposit = async () => {
-    if (loading || !contract || !selectedToken || !amount) return;
+    if (
+      contractState === AsyncState.LOADING ||
+      !contract ||
+      !selectedToken ||
+      !amount
+    )
+      return;
 
     const weiAmount = ethers.parseEther(amount);
     console.log("Deposit amount:", weiAmount.toString());
 
     try {
-      setDepositState(PromiseState.LOADING);
-      setMessage(null);
-
-      const tokens = await contract.getAllAllowedDepositTokens();
-      console.log("Allowed tokens:", tokens);
+      setDepositLoading();
 
       const tx = await contract.stake(selectedToken, weiAmount);
-      console.log("Deposit transaction:", tx);
-
       const depositResult = await tx.wait();
       console.log("Deposit result:", depositResult);
 
-      console.log("Successfully deposited!");
-
-      const tokenSymbol = allowedTokens.find(
-        (t) => t.address === selectedToken
-      )?.symbol;
-      setMessage({
-        type: "success",
-        content: `Successfully deposited ${amount} ${tokenSymbol}!`,
-      });
-
-      // 디파짓 완료 후 스테이킹 데이터 업데이트
+      setDepositSuccess();
       await getUserStakedTokens();
-      setDepositState(PromiseState.FINISH);
     } catch (error: any) {
       console.error("Deposit failed:", error);
-      setMessage({ type: "error", content: error.message });
-      setDepositState(PromiseState.ERROR);
+      setDepositError(error);
     }
   };
 
-  // 토큰 활성화
   const handleAllowedTokens = async () => {
-    if (loading || !contract) return;
+    if (contractState === AsyncState.LOADING || !contract) return;
 
     try {
       const tx = await contract.enableDepositToken(selectedToken);
@@ -114,7 +89,7 @@ function SingleDeposit() {
   };
 
   const getUserStakedTokens = async () => {
-    if (loading || !contract) return;
+    if (contractState === AsyncState.LOADING || !contract) return;
 
     try {
       const stakedData = await Promise.all(
@@ -134,7 +109,7 @@ function SingleDeposit() {
   };
 
   const getAllAllowedDepositTokens = async () => {
-    if (loading || !contract) return;
+    if (contractState === AsyncState.LOADING || !contract) return;
 
     try {
       const tokens = await contract.getAllAllowedDepositTokens();
@@ -145,19 +120,21 @@ function SingleDeposit() {
   };
 
   const getDepositReward = async () => {
-    if (loading || !contract) return;
+    if (contractState === AsyncState.LOADING || !contract) return;
 
     try {
-      const userClamiabletAAA = await contract.estimateReward2(
-        allowedTokens[0].address,
-        allowedTokens[1].address,
-        address
-      );
-      const userClamiabletBBB = await contract.estimateReward2(
-        allowedTokens[1].address,
-        allowedTokens[0].address,
-        address
-      );
+      const [userClamiabletAAA, userClamiabletBBB] = await Promise.all([
+        contract.estimateReward2(
+          allowedTokens[0].address,
+          allowedTokens[1].address,
+          address
+        ),
+        contract.estimateReward2(
+          allowedTokens[1].address,
+          allowedTokens[0].address,
+          address
+        ),
+      ]);
 
       const userClamiabletAAAInEther = ethers.formatUnits(
         userClamiabletAAA,
@@ -167,6 +144,7 @@ function SingleDeposit() {
         userClamiabletBBB,
         18
       );
+
       const totalClaimable =
         parseFloat(userClamiabletAAAInEther) +
         parseFloat(userClamiabletBBBInEther);
@@ -178,24 +156,26 @@ function SingleDeposit() {
   };
 
   useEffect(() => {
-    if (!loading) {
+    if (contractState !== AsyncState.LOADING) {
       getUserStakedTokens();
       getAllAllowedDepositTokens();
       getDepositReward();
     }
-  }, [loading, contract]);
+  }, [contractState, contract]);
 
   return (
     <div className="bg-white p-4 rounded-lg text-black">
       <h1 className="text-xl font-medium">Single Deposit</h1>
       <h2 className="text-lg font-medium mt-4">My rewards</h2>
       <p>{rewardTokens}</p>
+
       <h2 className="text-lg font-medium mt-4">Deposit Amount</h2>
       {Object.entries(stakedTokens).map(([symbol, amount]) => (
         <p key={symbol}>
           {amount} {symbol}
         </p>
       ))}
+
       <ApproveToken
         onApproved={handleApproved}
         selectedToken={selectedToken}
@@ -204,8 +184,8 @@ function SingleDeposit() {
         setAmount={setAmount}
         contractAddress={SINGLE_DEPOSIT_CONTRACT_ADDRESS}
       />
-      <h2 className="text-lg font-medium mt-4">Enable Token</h2>
 
+      <h2 className="text-lg font-medium mt-4">Enable Token</h2>
       <Button
         color="blue"
         onClick={handleAllowedTokens}
@@ -213,27 +193,26 @@ function SingleDeposit() {
       >
         Enable Token
       </Button>
-      <>
-        <h2 className="text-lg font-medium mt-4">Deposit Token</h2>
-        <Button
-          color="green"
-          onClick={handleDeposit}
-          disabled={
-            !selectedToken || !amount || depositState === PromiseState.LOADING
-          }
-        >
-          {depositState === PromiseState.LOADING ? "Depositing..." : "Deposit"}
-        </Button>
-        {message && (
-          <div
-            className={`text-sm mt-2 ${
-              message.type === "success" ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            {message.content}
-          </div>
-        )}
-      </>
+
+      <h2 className="text-lg font-medium mt-4">Deposit Token</h2>
+      <Button
+        color="green"
+        onClick={handleDeposit}
+        disabled={
+          !selectedToken || !amount || depositState === AsyncState.LOADING
+        }
+      >
+        {depositState === AsyncState.LOADING ? "Depositing..." : "Deposit"}
+      </Button>
+      {depositState === AsyncState.SUCCESS && (
+        <div className="text-sm text-green-500 mt-2">
+          Successfully deposited {amount}{" "}
+          {allowedTokens.find((t) => t.address === selectedToken)?.symbol}!
+        </div>
+      )}
+      {depositError && (
+        <div className="text-sm text-red-500 mt-2">{depositError.message}</div>
+      )}
     </div>
   );
 }

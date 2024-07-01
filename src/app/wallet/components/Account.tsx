@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
 import { useAccount, useDisconnect, UseBalanceReturnType } from "wagmi";
-import { Button } from "../ui";
-import {
-  useNativeBalance,
-  useTokenBalances,
-  useTokenBalances2,
-} from "@/hooks/useBalances";
+import { Button } from "@/shared/components/ui";
+import { useNativeBalance, useTokenBalances } from "@/shared/hooks/useBalances";
 
 export function Account() {
   const { address, connector } = useAccount();
@@ -15,29 +10,29 @@ export function Account() {
 
   const nativeBalance: UseBalanceReturnType = useNativeBalance(address);
   const tokenBalances: UseBalanceReturnType[] = useTokenBalances(address);
-  const { data: tokenBalances2Data } = useTokenBalances2(address);
+  // const { data: tokenBalances2Data } = useTokenBalances2(address);
 
-  useEffect(() => {
-    if (nativeBalance.data) {
-      console.log("Native Balance:", serializeBalanceData(nativeBalance.data));
-    }
+  // useEffect(() => {
+  //   if (nativeBalance.data) {
+  //     console.log("Native Balance:", serializeBalanceData(nativeBalance.data));
+  //   }
 
-    tokenBalances.forEach(({ data }, index) => {
-      if (data) {
-        console.log(`Token Balance ${index}:`, serializeBalanceData(data));
-      }
-    });
+  //   tokenBalances.forEach(({ data }, index) => {
+  //     if (data) {
+  //       console.log(`Token Balance ${index}:`, serializeBalanceData(data));
+  //     }
+  //   });
 
-    console.log(">>>> Token Balances 2:", tokenBalances2Data);
-  }, [nativeBalance.data, tokenBalances, tokenBalances2Data]);
+  //   console.log(">>>> Token Balances 2:", tokenBalances2Data);
+  // }, [nativeBalance.data, tokenBalances, tokenBalances2Data]);
 
-  const serializeBalanceData = (data: any) => {
-    if (!data) return null;
-    return {
-      ...data,
-      value: data.value.toString(),
-    };
-  };
+  // const serializeBalanceData = (data: any) => {
+  //   if (!data) return null;
+  //   return {
+  //     ...data,
+  //     value: data.value.toString(),
+  //   };
+  // };
 
   return (
     <div className="flex flex-col items-start space-y-4 bg-white p-4 rounded-lg text-black">
@@ -51,6 +46,7 @@ export function Account() {
           </div>
         </div>
       </div>
+
       {nativeBalance.isLoading ? (
         <div className="text-xs text-gray-500">Loading balance...</div>
       ) : nativeBalance.isError ? (
@@ -61,6 +57,7 @@ export function Account() {
           {nativeBalance.data?.symbol}
         </div>
       )}
+
       <div className="text-sm font-medium text-black mt-4">
         Token Balances:
         {tokenBalances.map(({ data, isLoading, isError }, index) => (
@@ -77,6 +74,7 @@ export function Account() {
           </div>
         ))}
       </div>
+
       {/* <div className="text-sm font-medium text-white mt-4">
         Token Balances 2:
         {!tokenBalances2Data || tokenBalances2Data.length === 0 ? (

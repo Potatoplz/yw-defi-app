@@ -1,3 +1,4 @@
+// TODO: dotenv 꼭 필요한지?
 import { config } from "dotenv";
 config();
 

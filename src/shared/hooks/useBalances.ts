@@ -64,6 +64,8 @@ export const useTokenBalances2 = (
       functionName: "name",
     },
   ]);
+
+  // TODO: useContract에서 function 호출하면 안됐었나?
   const balances = useReadContracts({
     contracts,
   });

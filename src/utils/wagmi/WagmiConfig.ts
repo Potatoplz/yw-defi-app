@@ -2,6 +2,7 @@ import { http, createConfig } from "wagmi";
 import { base, mainnet, optimism, avalancheFuji } from "wagmi/chains";
 import { injected, metaMask, safe, walletConnect } from "wagmi/connectors";
 
+// wallet connect cloud project ID
 const projectId = "3fbb6bba6f1de962d911bb5b5c9dba88";
 const MetaMaskOptions = {
   dappMetadata: {

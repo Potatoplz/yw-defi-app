@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { useAsyncState } from "@/shared/hooks/useAsyncState";
 
 export function useContract(contractAddress: any, contractABI: any) {
-  const { address, isConnected, connector, chain } = useAccount(); // chain 추가
+  const { address, isConnected, connector, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const { state, error, setLoading, setSuccess, setErrorState } =
@@ -31,11 +31,7 @@ export function useContract(contractAddress: any, contractABI: any) {
           setContract(contractInstance);
           setSuccess();
         } catch (err) {
-          if (err instanceof Error) {
-            setErrorState(err);
-          } else {
-            setErrorState(new Error("An unknown error occurred"));
-          }
+          setErrorState(new Error("An unknown error occurred"));
         }
       }
     }

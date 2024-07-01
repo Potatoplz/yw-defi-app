@@ -59,19 +59,17 @@ function SingleDeposit() {
       return;
 
     const weiAmount = ethers.parseEther(amount);
-    console.log("Deposit amount:", weiAmount.toString());
 
     try {
       setDepositLoading();
 
       const tx = await contract.stake(selectedToken, weiAmount);
       const depositResult = await tx.wait();
-      console.log("Deposit result:", depositResult);
+      // console.log("Deposit result:", depositResult);
 
       setDepositSuccess();
       await getUserStakedTokens();
     } catch (error: any) {
-      console.error("Deposit failed:", error);
       setDepositError(error);
     }
   };
@@ -82,7 +80,6 @@ function SingleDeposit() {
     try {
       const tx = await contract.enableDepositToken(selectedToken);
       await tx.wait();
-      console.log(`Token ${selectedToken} is now allowed.`);
     } catch (error) {
       console.error("Failed to enable deposit token:", error);
     }
@@ -101,7 +98,6 @@ function SingleDeposit() {
       );
 
       const mergedData = Object.assign({}, ...stakedData);
-      console.log("Staked tokens:", mergedData);
       setStakedTokens(mergedData);
     } catch (error) {
       console.error("Failed to get staked tokens:", error);
@@ -166,9 +162,12 @@ function SingleDeposit() {
   return (
     <div className="bg-white p-4 rounded-lg text-black">
       <h1 className="text-xl font-medium">Single Deposit</h1>
+
+      {/* ======================== My rewards ======================== */}
       <h2 className="text-lg font-medium mt-4">My rewards</h2>
       <p>{rewardTokens}</p>
 
+      {/* ======================== Deposit Amount ======================== */}
       <h2 className="text-lg font-medium mt-4">Deposit Amount</h2>
       {Object.entries(stakedTokens).map(([symbol, amount]) => (
         <p key={symbol}>
@@ -176,6 +175,7 @@ function SingleDeposit() {
         </p>
       ))}
 
+      {/* ======================== Approve Token ======================== */}
       <ApproveToken
         onApproved={handleApproved}
         selectedToken={selectedToken}
@@ -185,6 +185,7 @@ function SingleDeposit() {
         contractAddress={SINGLE_DEPOSIT_CONTRACT_ADDRESS}
       />
 
+      {/* ======================== Enable Token ======================== */}
       <h2 className="text-lg font-medium mt-4">Enable Token</h2>
       <Button
         color="blue"
@@ -194,6 +195,7 @@ function SingleDeposit() {
         Enable Token
       </Button>
 
+      {/* ======================== Deposit Token ======================== */}
       <h2 className="text-lg font-medium mt-4">Deposit Token</h2>
       <Button
         color="green"

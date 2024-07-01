@@ -8,6 +8,7 @@ type ButtonProps = {
   disabled?: boolean;
 };
 
+// TODO: Refactoring required. children 타입 설정. React.PropsWithChildren.
 const Button: React.FC<ButtonProps> = ({
   size = "medium",
   color = "blue",

@@ -1,4 +1,3 @@
-import { ethers } from "ethers";
 import { useAccount, useWalletClient } from "wagmi";
 import { erc20Abi } from "viem";
 import { useContract } from "@/shared/hooks/useContract";
@@ -17,6 +16,7 @@ export const useApproveToken = (
     state: contractState,
     error: contractError,
   } = useContract(tokenAddress, erc20Abi);
+
   const { state, error, setLoading, setSuccess, setErrorState } =
     useAsyncState();
 

@@ -1,10 +1,11 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 
 import { Button } from "@ui";
 import { Checkbox } from "@ui";
+import { Badge } from "@ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,16 +15,17 @@ import {
   DropdownMenuTrigger,
 } from "@ui";
 
+import { statuses } from "../data/data";
+
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Payment = {
+export type Tasks = {
   id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
+  title: string;
+  status: "pending" | "processing" | "success" | "failed" | "canceled";
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Tasks>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -45,34 +47,39 @@ export const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "id",
+    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => {
+    accessorKey: "title",
+    cell: ({ row }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("title")}
+          </span>
+        </div>
       );
     },
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    accessorKey: "status",
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
+      const label = statuses.find(
+        (label) => label.value === row.original.status
+      );
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return (
+        <div className="flex space-x-2">
+          {label && <Badge variant="outline">{label.label}</Badge>}
+          {/* <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("status")}
+          </span> */}
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
     },
   },
   {

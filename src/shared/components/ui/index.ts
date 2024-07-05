@@ -1,5 +1,9 @@
-// export { default as Button } from "./button";
+// shadcn
+export * from "./button";
+export * from "./checkbox";
+export * from "./input";
+export * from "./dropdown-menu";
+export * from "./table";
+
+// custom
 export { default as Modal } from "./Modal";
-// export { default as Dialog } from "./Dialog";
-// export { default as Alert } from "./Alert";
-// export { default as Input } from "./Input";

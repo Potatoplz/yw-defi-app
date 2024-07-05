@@ -21,16 +21,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
+} from "@ui";
 
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+import { Button } from "@ui";
+import { Input } from "@ui";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+} from "@ui";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

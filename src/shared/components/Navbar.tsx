@@ -46,6 +46,9 @@ const Navbar: React.FC = () => {
           <Link href="/" className="text-white">
             Home
           </Link>
+          <Link href="/bbs" className="text-white">
+            BBS
+          </Link>
           <Link href="/single-deposit" className="text-white">
             Single-Deposit
           </Link>
